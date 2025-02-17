@@ -1,0 +1,36 @@
+pipeline {
+    environment {
+        prj_name = """${JOB_NAME.split('/')[0]}"""
+        apl_name = """${JOB_NAME.minus(JOB_NAME.split('/')[0] + '/' + JOB_NAME.split('/')[0] + '-')}"""
+        registry = "registry.hml.fiesc.com.br"
+        registryCredential = 'registry-hml'
+        dockerTag = "$registry/$prj_name/$apl_name:HML"
+    }
+    agent any
+    tools {
+        maven 'maven'
+        jdk 'JDK17'
+    }
+    stages {
+        stage('Build app') {
+            steps {
+                sh "./mvnw clean package"
+            }
+        }
+        stage('Build HML Image') {
+            steps {
+                sh "docker build -f docker/Dockerfile -t $dockerTag ."
+            }
+        }
+        stage('Push Docker Image to HML') {
+            steps {
+                script {
+                    docker.withRegistry("https://$registry", registryCredential) {
+                        sh "docker push $dockerTag"
+                    }
+                }
+            }
+        }
+
+    }
+}

@@ -1,0 +1,6 @@
+*
+!docker/glibc-langpack-pt-2.34-40.el9_1.1.x86_64.rpm
+!target/*-runner
+!target/*-runner.jar
+!target/lib/*
+!target/quarkus-app/*
