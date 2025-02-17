@@ -2,6 +2,7 @@ package br.bookstore.utils;
 
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
+import org.jboss.logging.Logger;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,12 +12,14 @@ import java.util.stream.Collectors;
 
 public class JsonUtils {
 
+    private static final Logger LOGGER = Logger.getLogger(JsonUtils.class.getName());
+
     public static <T> List<T> toList(String json, Class<T> object) {
         try (Jsonb jsonb = JsonbBuilder.create()) {
             var hashMap = jsonb.fromJson(json, Map[].class);
             return Arrays.stream(hashMap).map(map -> toObject(toJson(map, jsonb), object, jsonb)).collect(Collectors.toList());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getCause());
             return new ArrayList<>();
         }
     }
